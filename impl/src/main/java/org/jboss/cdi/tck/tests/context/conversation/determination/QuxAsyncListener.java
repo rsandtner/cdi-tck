@@ -26,7 +26,6 @@ import javax.servlet.AsyncListener;
 
 /**
  * @author Martin Kouba
- * 
  */
 public class QuxAsyncListener implements AsyncListener {
 
@@ -34,20 +33,15 @@ public class QuxAsyncListener implements AsyncListener {
     Conversation conversation;
 
     @Inject
-    TestResult testResult;
+    StatusBean testResult;
 
     @Override
     public void onComplete(AsyncEvent event) throws IOException {
 
-        if ("test".equals(event.getSuppliedRequest().getParameter("action"))) {
-            if (FooServlet.CID.equals(conversation.getId())) {
-                // The long-running conversation is available
-                testResult.setAsyncListenerOk();
-            }
+        if (FooServlet.CID.equals(conversation.getId())) {
+            // The long-running conversation is available
+            testResult.setAsyncListenerOk();
         }
-
-        event.getAsyncContext().getResponse().setContentType("text/plain");
-        event.getAsyncContext().getResponse().getWriter().append(testResult.toString());
     }
 
     @Override

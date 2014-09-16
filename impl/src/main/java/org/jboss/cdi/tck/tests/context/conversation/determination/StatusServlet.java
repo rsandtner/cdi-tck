@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2012, Red Hat, Inc., and individual contributors
+ * Copyright 2014, Red Hat, Inc., and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -17,35 +17,21 @@
 package org.jboss.cdi.tck.tests.context.conversation.determination;
 
 import java.io.IOException;
-import java.util.concurrent.Executors;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletException;
+import javax.inject.Inject;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jboss.cdi.tck.util.Timer;
+@WebServlet(name = "StatusServlet", urlPatterns = { "/Status" })
+public class StatusServlet extends HttpServlet {
 
-@WebServlet(value = { "/foo-async" }, asyncSupported = true)
-@SuppressWarnings("serial")
-public class AsyncFooServlet extends HttpServlet {
+    @Inject
+    StatusBean statusBean;
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        final AsyncContext actx = req.startAsync();
-        actx.addListener(actx.createListener(QuxAsyncListener.class), req, resp);
-        Executors.newSingleThreadExecutor().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Timer.startNew(100l);
-                } catch (InterruptedException e) {
-                    throw new IllegalStateException("Interrupted");
-                }
-                actx.complete();
-            }
-        });
+    protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.getWriter().write(statusBean.toString());
     }
+
 }
